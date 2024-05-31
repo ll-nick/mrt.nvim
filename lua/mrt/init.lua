@@ -1,7 +1,10 @@
 local mrt = {}
 
 local config = {
-	source_command = "source /opt/mrtsoftware/setup.bash && source /opt/mrtros/setup.bash",
+	pre_build_commands = {
+		"source /opt/mrtsoftware/setup.bash",
+		"source /opt/mrtros/setup.bash",
+	},
 	build_command = "mrt catkin build -j4 -c --no-coverage",
 	pane_height = 10,
 }
@@ -30,13 +33,17 @@ local map_compile_commands = function()
 	return "jq -s 'map(.[])' $(echo \"build_$(cat .catkin_tools/profiles/profiles.yaml | sed 's/active: //')\" | sed 's/_release//')/**/compile_commands.json > compile_commands.json"
 end
 
+local pre_build_command = function()
+	return table.concat(config.pre_build_commands, " && ")
+end
+
 mrt.build_workspace = function()
-	local build_command = config.source_command .. " && " .. config.build_command .. " && " .. map_compile_commands()
+	local build_command = pre_build_command() .. " && " .. config.build_command .. " && " .. map_compile_commands()
 	execute_in_new_pane(build_command)
 end
 
 mrt.build_current_package = function()
-	local build_command = config.source_command
+	local build_command = pre_build_command()
 		.. " && "
 		.. command_in_current_file_directory(config.build_command .. " --this")
 		.. " && "
