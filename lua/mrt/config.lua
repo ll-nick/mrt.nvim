@@ -6,6 +6,7 @@ local settings = {
 		"source /opt/mrtros/setup.bash",
 	},
 	build_command = "mrt catkin build -j4 -c --no-coverage",
+	pane_handler = "nvim",
 	pane_height = 10,
 }
 
