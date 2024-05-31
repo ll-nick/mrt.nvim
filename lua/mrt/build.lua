@@ -14,7 +14,11 @@ local M = {}
 
 M.workspace = function()
 	local settings = config.get_settings()
-	local build_command = pre_build_command() .. " && " .. settings.build_command .. " && " .. map_compile_commands()
+	local build_command = pre_build_command()
+		.. " && "
+		.. settings.build_workspace_command
+		.. " && "
+		.. map_compile_commands()
 	utils.execute_in_new_pane(build_command)
 end
 
@@ -22,7 +26,17 @@ M.current_package = function()
 	local settings = config.get_settings()
 	local build_command = pre_build_command()
 		.. " && "
-		.. utils.command_in_current_file_directory(settings.build_command .. " --this")
+		.. utils.command_in_current_file_directory(settings.build_package_command)
+		.. " && "
+		.. map_compile_commands()
+	utils.execute_in_new_pane(build_command)
+end
+
+M.current_package_tests = function()
+	local settings = config.get_settings()
+	local build_command = pre_build_command()
+		.. " && "
+		.. utils.command_in_current_file_directory(settings.build_package_tests_command)
 		.. " && "
 		.. map_compile_commands()
 	utils.execute_in_new_pane(build_command)

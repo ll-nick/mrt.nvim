@@ -25,6 +25,15 @@ mrt.build_current_package = function()
 	build.current_package()
 end
 
+mrt.build_current_package_tests = function()
+	if not utils.is_catkin_workspace() then
+		print("Command must be called from inside a catkin workspace.")
+		return
+	end
+
+	build.current_package_tests()
+end
+
 mrt.switch_catkin_profile = function()
 	if not utils.is_catkin_workspace() then
 		print("This is not a valid Catkin workspace.")
