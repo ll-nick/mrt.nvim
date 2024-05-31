@@ -34,15 +34,6 @@ M.command_in_current_file_directory = function(command)
 	return execute_command
 end
 
-M.map_compile_commands = function()
-	return "jq -s 'map(.[])' $(echo \"build_$(cat .catkin_tools/profiles/profiles.yaml | sed 's/active: //')\" | sed 's/_release//')/**/compile_commands.json > compile_commands.json"
-end
-
-M.pre_build_command = function()
-	local settings = require("mrt.config").get_settings()
-	return table.concat(settings.pre_build_commands, " && ")
-end
-
 M.is_catkin_workspace = function()
 	local handle = io.popen("mrt catkin locate 2>&1")
 	if not handle then
