@@ -26,4 +26,21 @@ M.pre_build_command = function()
 	return table.concat(settings.pre_build_commands, " && ")
 end
 
+M.is_catkin_workspace = function()
+	local handle = io.popen("mrt catkin locate 2>&1")
+	if not handle then
+		print("Failed to open pipe for command execution.")
+		return false
+	end
+
+	local result = handle:read("*a")
+	handle:close()
+
+	if result:match("No_catkin_workspace_root_found") or result:match("catkin: command not found") then
+		return false
+	end
+
+	return true
+end
+
 return M
