@@ -1,5 +1,6 @@
 local mrt = {}
 
+local catkin_profile = require("mrt.catkin_profile")
 local config = require("mrt.config")
 local utils = require("mrt.utils")
 
@@ -33,6 +34,15 @@ mrt.build_current_package = function()
 		.. " && "
 		.. utils.map_compile_commands()
 	utils.execute_in_new_pane(build_command)
+end
+
+mrt.switch_catkin_profile = function()
+	if not utils.is_catkin_workspace() then
+		print("This is not a valid Catkin workspace.")
+		return
+	end
+
+	catkin_profile.switch_profile_ui()
 end
 
 return mrt
