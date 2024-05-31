@@ -1,5 +1,3 @@
-local settings = require("mrt.config").get_settings()
-
 local M = {}
 
 M.execute_in_new_pane = function(command)
@@ -8,6 +6,7 @@ M.execute_in_new_pane = function(command)
 	vim.cmd("terminal " .. command)
 end
 
+	local settings = require("mrt.config").get_settings()
 M.command_in_current_file_directory = function(command)
 	local current_file_directory = vim.fn.expand("%:p:h")
 	local execute_command = "pushd > /dev/null "
@@ -23,6 +22,7 @@ M.map_compile_commands = function()
 end
 
 M.pre_build_command = function()
+	local settings = require("mrt.config").get_settings()
 	return table.concat(settings.pre_build_commands, " && ")
 end
 

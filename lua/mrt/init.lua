@@ -4,7 +4,6 @@ local config = require("mrt.config")
 local utils = require("mrt.utils")
 
 mrt.setup = require("mrt.config").setup
-local settings = config.get_settings()
 
 mrt.build_workspace = function()
 	if not utils.is_catkin_workspace() then
@@ -12,6 +11,7 @@ mrt.build_workspace = function()
 		return
 	end
 
+	local settings = config.get_settings()
 	local build_command = utils.pre_build_command()
 		.. " && "
 		.. settings.build_command
@@ -26,6 +26,7 @@ mrt.build_current_package = function()
 		return
 	end
 
+	local settings = config.get_settings()
 	local build_command = utils.pre_build_command()
 		.. " && "
 		.. utils.command_in_current_file_directory(settings.build_command .. " --this")
