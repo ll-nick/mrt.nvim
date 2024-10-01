@@ -1,54 +1,71 @@
-local M = {}
-
-local execute_in_new_nvim_pane = function(command, pane_height)
-	vim.cmd("below split")
-	vim.cmd("resize " .. pane_height)
-	vim.cmd("terminal " .. command)
-end
-
-local execute_in_new_tmux_pane = function(command, pane_height)
-	local split_window = "silent !tmux split-window -v -l " .. pane_height
-	local execute_command_and_wait = string.format("bash -c \"%s; read -p 'Press Enter to exit'\"", command)
-	local tmux_command = split_window .. " " .. execute_command_and_wait
-	vim.cmd(tmux_command)
-end
-
-M.execute_in_new_pane = function(command)
-	local settings = require("mrt.config").get_settings()
-	if settings.pane_handler == "nvim" then
-		execute_in_new_nvim_pane(command, settings.pane_height)
-	elseif settings.pane_handler == "tmux" then
-		execute_in_new_tmux_pane(command, settings.pane_height)
-	else
-		print("Invalid pane handler.")
-	end
-end
-
-M.command_in_current_file_directory = function(command)
-	local current_file_directory = vim.fn.expand("%:p:h")
-	local execute_command = "pushd > /dev/null "
-		.. current_file_directory
-		.. " && "
-		.. command
-		.. " && popd > /dev/null"
-	return execute_command
-end
-
-M.is_catkin_workspace = function()
-	local handle = io.popen("mrt catkin locate 2>&1")
+local function run_command(cmd)
+	local handle = io.popen(cmd .. " 2>&1") -- Redirect stderr to stdout
 	if not handle then
-		print("Failed to open pipe for command execution.")
-		return false
+		vim.notify("Failed to open pipe for command execution.", vim.log.levels.ERROR)
+		return nil
 	end
 
-	local result = handle:read("*a")
+	local result = handle:read("*a") -- Read all output
 	handle:close()
 
-	if result:match("No_catkin_workspace_root_found") or result:match("catkin: command not found") then
+	return vim.fn.trim(result)
+end
+
+local function get_workspace_info()
+	return run_command("mrt catkin locate")
+end
+
+local function is_catkin_workspace(workspace_info)
+	if workspace_info:match("No_catkin_workspace_root_found") or workspace_info:match("catkin: command not found") then
 		return false
 	end
 
 	return true
+end
+
+local M = {}
+
+M.get_plugin_path = function()
+	local str = debug.getinfo(1, "S").source:sub(2)
+	return str:match("(.*/)") .. "../../"
+end
+
+M.get_build_script_path = function()
+	return M.get_plugin_path() .. "shell/build.sh" -- Just append shell/build.sh
+end
+
+M.has_dispatch = function()
+	return vim.fn.exists(":Make") == 2
+end
+
+M.get_workspace_root = function()
+	local workspace_root = get_workspace_info()
+
+	if not is_catkin_workspace(workspace_root) then
+		vim.notify("Command must be executed inside a catkin workspace.", vim.log.levels.ERROR)
+		return nil
+	end
+
+	return workspace_root
+end
+
+M.is_catkin_workspace = function()
+	local workspace_root = get_workspace_info()
+	return is_catkin_workspace(workspace_root)
+end
+
+M.get_package_name = function()
+	-- Execute `catkin list --this --unformatted` in the directory of the current file
+	local current_file_dir = vim.fn.expand("%:p:h")
+	local package_name = run_command("cd " .. current_file_dir .. " && mrt catkin list --this --unformatted")
+
+	-- Check if the command succeeded and returned a valid package name
+	if package_name == "" then
+		vim.notify("No package found in the current directory.", vim.log.levels.ERROR)
+		return nil
+	end
+
+	return package_name
 end
 
 return M

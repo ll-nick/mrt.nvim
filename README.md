@@ -13,7 +13,8 @@ If you did and wonder how you can move your VS Code based workflow to Neovim, th
 ## 🚀 Features
 
 - Execute builds with a single command
-- Run build commands in a new neovim or tmux pane
+- Execute synchronous or asynchronous builds
+- Utilize the quickfix list to navigate through build errors
 - Switch your catkin profile interactively
  
 ## ⚡️ Requirements
@@ -21,7 +22,7 @@ If you did and wonder how you can move your VS Code based workflow to Neovim, th
 - Neovim
 - mrt tools
 - jq (To map compile commands to a single file)
-- tmux (optional)
+- [tpope/vim-dispatch](https://github.com/tpope/vim-dispatch) (Optional, for asynchronous builds)
 
 ## 📦 Installation
 
@@ -39,9 +40,13 @@ A more complete example:
 {
     "ll-nick/mrt.nvim",
 
+  	dependencies = {
+		{ "tpope/vim-dispatch" }, -- for asynchronous builds
+	},
+
     config = function()
         require("mrt").setup({
-            pane_handler = "tmux",
+            build_workspace_flags = "-j128",
         })
     end,
     keys = {
@@ -68,27 +73,14 @@ Here is an example configuration using the default values:
 
 ```lua
 require("mrt").setup({
-	-- A list of commands to run before running a build command
-	pre_build_commands = {
-		"source /opt/mrtsoftware/setup.bash",
-		"source /opt/mrtros/setup.bash",
-	},
+	-- The flags for building an entire catkin workspace
+	build_workspace_flags = "-j4 -c --no-coverage",
 
-	-- The command to build an entire catkin workspace
-	build_workspace_command = "mrt catkin build -j4 -c --no-coverage",
+	-- The flags for building the current package
+	build_package_flags = "-j4 -c --no-coverage",
 
-	-- The command to build the current package
-	build_package_command = "mrt catkin build -j4 -c --no-coverage --this",
-
-	-- The command to build tests for the current package
-	build_package_tests_command = "mrt catkin build -j4 -c --this --no-deps --no-coverage --verbose --catkin-make-args tests",
-
-	-- The terminal handler to use for running commands
-	-- Valid values are "nvim" and "tmux"
-	pane_handler = "nvim",
-
-	-- The height of the terminal pane to open
-	pane_height = 10,
+	-- The flags for building tests for the current package
+	build_package_tests_command = "-j4 -c --no-deps --no-coverage --verbose --catkin-make-args tests",
 })
 ```
 
