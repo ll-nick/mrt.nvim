@@ -1,3 +1,6 @@
+local map_compile_commands = function()
+	return "jq -s 'map(.[])' $(echo \"build_$(cat .catkin_tools/profiles/profiles.yaml | sed 's/active: //')\" | sed 's/_release//')/**/compile_commands.json > compile_commands.json"
+end
 local function run_command(cmd)
 	local handle = io.popen(cmd .. " 2>&1") -- Redirect stderr to stdout
 	if not handle then
@@ -66,6 +69,10 @@ M.get_package_name = function()
 	end
 
 	return package_name
+end
+
+M.map_compile_commands = function()
+	return run_command(map_compile_commands())
 end
 
 return M
