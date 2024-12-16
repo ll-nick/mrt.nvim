@@ -1,6 +1,7 @@
 local map_compile_commands = function()
 	return "jq -s 'map(.[])' $(echo \"build_$(cat .catkin_tools/profiles/profiles.yaml | sed 's/active: //')\" | sed 's/_release//')/**/compile_commands.json > compile_commands.json"
 end
+
 local function run_command(cmd)
 	local handle = io.popen(cmd .. " 2>&1") -- Redirect stderr to stdout
 	if not handle then
@@ -28,28 +29,8 @@ end
 
 local M = {}
 
-M.get_plugin_path = function()
-	local str = debug.getinfo(1, "S").source:sub(2)
-	return str:match("(.*/)") .. "../../"
-end
-
-M.get_build_script_path = function()
-	return M.get_plugin_path() .. "shell/build.sh" -- Just append shell/build.sh
-end
-
 M.has_dispatch = function()
 	return vim.fn.exists(":Make") == 2
-end
-
-M.get_workspace_root = function()
-	local workspace_root = get_workspace_info()
-
-	if not is_catkin_workspace(workspace_root) then
-		vim.notify("Command must be executed inside a catkin workspace.", vim.log.levels.ERROR)
-		return nil
-	end
-
-	return workspace_root
 end
 
 M.is_catkin_workspace = function()
