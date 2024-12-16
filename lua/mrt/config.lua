@@ -13,6 +13,7 @@ local settings = {
 
 M.setup = function(options)
 	settings = vim.tbl_extend("force", settings, options or {})
+	vim.cmd("compiler mrt")
 end
 
 M.get_settings = function()
