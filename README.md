@@ -32,28 +32,31 @@ For example, with [lazy.nvim](https://github.com/folke/lazy.nvim), the minimum c
 ```lua
 {
   'll-nick/mrt.nvim',
+  config = function()
+    require("mrt").setup({})
+  end,
 }
 ```
 
 A more complete example:
 ```lua
 {
-    "ll-nick/mrt.nvim",
+  "ll-nick/mrt.nvim",
 
-  	dependencies = {
-		{ "tpope/vim-dispatch" }, -- for asynchronous builds
-	},
+  dependencies = {
+    { "tpope/vim-dispatch" }, -- for asynchronous builds
+  },
 
-    config = function()
-        require("mrt").setup({
-            build_workspace_flags = "-j128",
-        })
-    end,
+  config = function()
+    require("mrt").setup({
+      build_workspace_flags = "-j128",
+    })
+  end,
     keys = {
-        { "<leader>bw", "<cmd>MrtBuildWorkspace<cr>", desc = "Build workspace" },
-        { "<leader>bp", "<cmd>MrtBuildCurrentPackage<cr>", desc = "Build current package" },
-        { "<leader>bt", "<cmd>MrtBuildCurrentPackageTests<cr>", desc = "Build tests for current package" },
-        { "<leader>sp", "<cmd>MrtSwitchCatkinProfile<cr>", desc = "Switch catkin profile" },
+      { "<leader>bw", "<cmd>MrtBuildWorkspace<cr>", desc = "Build workspace" },
+      { "<leader>bp", "<cmd>MrtBuildCurrentPackage<cr>", desc = "Build current package" },
+      { "<leader>bt", "<cmd>MrtBuildCurrentPackageTests<cr>", desc = "Build tests for current package" },
+      { "<leader>sp", "<cmd>MrtSwitchCatkinProfile<cr>", desc = "Switch catkin profile" },
     },
 }
 ```
@@ -73,14 +76,14 @@ Here is an example configuration using the default values:
 
 ```lua
 require("mrt").setup({
-	-- The flags for building an entire catkin workspace
-	build_workspace_flags = "-j4 -c --no-coverage",
+  -- The flags for building an entire catkin workspace
+  build_workspace_flags = "-j4 -c --no-coverage",
 
-	-- The flags for building the current package
-	build_package_flags = "-j4 -c --no-coverage",
+  -- The flags for building the current package
+  build_package_flags = "-j4 -c --no-coverage",
 
-	-- The flags for building tests for the current package
-	build_package_tests_command = "-j4 -c --no-deps --no-coverage --verbose --catkin-make-args tests",
+  -- The flags for building tests for the current package
+  build_package_tests_command = "-j4 -c --no-deps --no-coverage --verbose --catkin-make-args tests",
 })
 ```
 
