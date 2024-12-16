@@ -28,15 +28,15 @@ end
 M.current_package = function()
 	local settings = config.get_settings()
 	local package_name = utils.get_package_name()
-	local flags = settings.build_package_flags .. " " .. package_name
-	run_build(flags)
+	local arguments = package_name .. " " .. settings.build_package_flags
+	run_build(arguments)
 end
 
 M.current_package_tests = function()
 	local settings = config.get_settings()
 	local package_name = utils.get_package_name()
-	local flags = settings.build_package_tests_command .. " " .. package_name
-	run_build(flags)
+	local arguments = package_name .. " " .. settings.build_package_tests_command
+	run_build(arguments)
 end
 
 return M
