@@ -31,6 +31,7 @@ For example, with [lazy.nvim](https://github.com/folke/lazy.nvim), the minimum c
 ```lua
 {
   'll-nick/mrt.nvim',
+  dependencies = { 'nvim-lua/plenary.nvim' },
 }
 ```
 
@@ -38,6 +39,7 @@ A more complete example:
 ```lua
 {
     "ll-nick/mrt.nvim",
+    dependencies = { 'nvim-lua/plenary.nvim' },
 
     config = function()
         require("mrt").setup({
