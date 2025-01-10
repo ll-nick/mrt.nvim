@@ -3,6 +3,7 @@ local mrt = {}
 local build = require("mrt.build")
 local catkin_profile = require("mrt.catkin_profile")
 local config = require("mrt.config")
+local package_picker = require("mrt.package_picker")
 local utils = require("mrt.utils")
 
 mrt.setup = config.setup
@@ -41,6 +42,15 @@ mrt.switch_catkin_profile = function()
 	end
 
 	catkin_profile.switch_profile_ui()
+end
+
+mrt.pick_catkin_package = function()
+	if not utils.is_catkin_workspace() then
+		print("This is not a valid Catkin workspace.")
+		return
+	end
+
+	package_picker.pick_catkin_package()
 end
 
 return mrt
