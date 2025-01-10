@@ -14,6 +14,7 @@ If you did and wonder how you can move your VS Code based workflow to Neovim, th
 
 - Execute builds with a single command
 - Run build commands in a new neovim or tmux pane
+- Switch packages using telescope
 - Switch your catkin profile interactively
  
 ## ⚡️ Requirements
@@ -31,16 +32,20 @@ For example, with [lazy.nvim](https://github.com/folke/lazy.nvim), the minimum c
 ```lua
 {
   'll-nick/mrt.nvim',
-  dependencies = { 'nvim-lua/plenary.nvim' },
-}
+  dependencies = { 
+    { 'nvim-lua/plenary.nvim' },
+    { 'nvim-telescope/telescope.nvim' },
+  }
 ```
 
 A more complete example:
 ```lua
 {
     "ll-nick/mrt.nvim",
-    dependencies = { 'nvim-lua/plenary.nvim' },
-
+    dependencies = { 
+      { 'nvim-lua/plenary.nvim' },
+      { 'nvim-telescope/telescope.nvim' },
+    },
     config = function()
         require("mrt").setup({
             pane_handler = "tmux",
@@ -62,6 +67,7 @@ A more complete example:
 - `:MrtBuildWorkspace`: Build the entire catkin workspace
 - `:MrtBuildCurrentPackage`: Build the current package
 - `:MrtBuildCurrentPackageTests`: Build tests for the current package
+- `:MrtPickCatkinPackage`: Open the Readme of a catkin package using telescope
 - `:MrtSwitchCatkinProfile`: Switch the catkin profile interactively
 
 ### 🔧 Configuration
