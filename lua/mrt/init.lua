@@ -5,6 +5,7 @@ local catkin_profile = require("mrt.catkin_profile")
 local config = require("mrt.config")
 local package_picker = require("mrt.package_picker")
 local utils = require("mrt.utils")
+local overseer_setup = require("mrt.mrt_overseer_setup")
 
 mrt.setup = config.setup
 
@@ -14,7 +15,7 @@ mrt.build_workspace = function()
         return
     end
 
-    build.workspace()
+    overseer_setup.run_build_workspace_template()
 end
 
 mrt.build_current_package = function()
