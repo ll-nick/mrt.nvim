@@ -11,10 +11,20 @@ local settings = {
     build_workspace_flags = { "build", "-j4", "-c", "--no-coverage" },
 
     -- The command to build the current package
-    build_package_command = "mrt catkin build -j4 -c --no-coverage --this",
+    build_package_flags = { "build", "-j4", "-c", "--no-coverage", "--this" },
 
     -- The command to build tests for the current package
-    build_package_tests_command = "mrt catkin build -j4 -c --this --no-deps --no-coverage --verbose --catkin-make-args tests",
+    build_package_tests_flags = {
+        "build",
+        "-j4",
+        "-c",
+        "--this",
+        "--no-deps",
+        "--no-coverage",
+        "--verbose",
+        "--catkin-make-args",
+        "tests",
+    },
 
     -- The terminal handler to use for running commands
     -- Valid values are "nvim" and "tmux"

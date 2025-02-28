@@ -30,7 +30,7 @@ mrt.build_current_package = function()
         return
     end
 
-    build.current_package()
+    overseer_setup.build_current_package()
 end
 
 mrt.build_current_package_tests = function()
@@ -40,7 +40,7 @@ mrt.build_current_package_tests = function()
         return
     end
 
-    build.current_package_tests()
+    overseer_setup.build_current_package_tests()
 end
 
 mrt.switch_catkin_profile = function()
