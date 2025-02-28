@@ -83,6 +83,7 @@ local register_build_workspace_template = function()
                     },
                     "on_result_diagnostics",
                     "on_result_diagnostics_quickfix",
+                    { "run_after", task_names = { "generate_compile_commands" } },
                 },
             }
         end,
