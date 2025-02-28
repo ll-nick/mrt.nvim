@@ -32,7 +32,8 @@ local find_readme_or_fallback_file = function(package_path)
 end
 
 M.pick_catkin_package = function()
-    local workspace_path = utils.find_workspace_root()
+    local cwd = Path:new(vim.fn.getcwd())
+    local workspace_path = utils.find_workspace_root(cwd)
     local packages = list_packages(workspace_path)
 
     if vim.tbl_isempty(packages) then

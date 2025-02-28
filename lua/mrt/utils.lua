@@ -36,20 +36,20 @@ M.command_in_current_file_directory = function(command)
     return execute_command
 end
 
-M.find_workspace_root = function()
-    local current_dir = vim.fn.getcwd()
-    while current_dir ~= "/" do
-        local catkin_tools_path = Path:new(current_dir, ".catkin_tools")
+M.find_workspace_root = function(directory)
+    local current_dir = directory
+    while current_dir:absolute() ~= "/" do
+        local catkin_tools_path = current_dir:joinpath(".catkin_tools")
         if catkin_tools_path:exists() and catkin_tools_path:is_dir() then
             return current_dir
         end
-        current_dir = Path:new(current_dir):parent().filename
+        current_dir = current_dir:parent()
     end
     return nil
 end
 
-M.is_catkin_workspace = function()
-    return M.find_workspace_root() ~= nil
+M.is_in_catkin_workspace = function(directory)
+    return M.find_workspace_root(directory) ~= nil
 end
 
 M.get_catkin_profiles = function()
