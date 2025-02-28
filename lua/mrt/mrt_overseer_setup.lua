@@ -98,7 +98,7 @@ M.register_templates = function()
     register_build_workspace_template()
 end
 
-M.run_build_workspace_template = function()
+M.build_workspace = function()
     overseer.run_template({ name = "mrt_build_workspace" })
 end
 

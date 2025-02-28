@@ -20,7 +20,7 @@ mrt.build_workspace = function()
         return
     end
 
-    overseer_setup.run_build_workspace_template()
+    overseer_setup.build_workspace()
 end
 
 mrt.build_current_package = function()
