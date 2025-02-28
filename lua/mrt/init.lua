@@ -15,7 +15,7 @@ overseer_setup.register_templates()
 mrt.build_workspace = function()
     local cwd = Path:new(vim.fn.getcwd())
     if not utils.is_in_catkin_workspace(cwd) then
-        print("Command must be called from inside a catkin workspace.")
+        vim.notify("Command must be called from inside a catkin workspace.")
         return
     end
 
@@ -25,7 +25,7 @@ end
 mrt.build_current_package = function()
     local cwd = Path:new(vim.fn.getcwd())
     if not utils.is_in_catkin_workspace(cwd) then
-        print("Command must be called from inside a catkin workspace.")
+        vim.notify("Command must be called from inside a catkin workspace.")
         return
     end
 
@@ -35,7 +35,7 @@ end
 mrt.build_current_package_tests = function()
     local cwd = Path:new(vim.fn.getcwd())
     if not utils.is_in_catkin_workspace(cwd) then
-        print("Command must be called from inside a catkin workspace.")
+        vim.notify("Command must be called from inside a catkin workspace.")
         return
     end
 
@@ -45,7 +45,7 @@ end
 mrt.switch_catkin_profile = function()
     local cwd = Path:new(vim.fn.getcwd())
     if not utils.is_in_catkin_workspace(cwd) then
-        print("Command must be called from inside a catkin workspace.")
+        vim.notify("Command must be called from inside a catkin workspace.")
         return
     end
 
@@ -55,7 +55,7 @@ end
 mrt.pick_catkin_package = function()
     local cwd = Path:new(vim.fn.getcwd())
     if not utils.is_in_catkin_workspace(cwd) then
-        print("Command must be called from inside a catkin workspace.")
+        vim.notify("Command must be called from inside a catkin workspace.")
         return
     end
 

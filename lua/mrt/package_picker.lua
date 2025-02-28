@@ -37,7 +37,7 @@ M.pick_catkin_package = function()
     local packages = list_packages(workspace_path)
 
     if vim.tbl_isempty(packages) then
-        print("No packages found in " .. workspace_path .. "/src")
+        vim.notify("No packages found in " .. workspace_path .. "/src")
         return
     end
 

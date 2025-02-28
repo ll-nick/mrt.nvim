@@ -3,7 +3,7 @@ local utils = require("mrt.utils")
 local set_profile = function(profile)
     local handle = io.popen("mrt catkin profile set " .. profile)
     if not handle then
-        print("Failed to open pipe for command execution.")
+        vim.notify("Failed to open pipe for command execution.")
         return false
     end
     handle:close()
@@ -14,12 +14,12 @@ M.switch_profile_ui = function()
     local profiles = utils.get_catkin_profiles()
 
     if not profiles then
-        print("Failed to get Catkin profiles.")
+        vim.notify("Failed to get catkin profiles.")
         return
     end
 
     if profiles.available == {} then
-        print("No profiles available to switch to.")
+        vim.notify("No profiles available to switch to.")
         return
     end
 
@@ -34,7 +34,7 @@ M.switch_profile_ui = function()
         end
 
         set_profile(selected_profile)
-        print("Switched to profile: " .. selected_profile)
+        vim.notify("Switched to profile: " .. selected_profile)
     end)
 end
 
