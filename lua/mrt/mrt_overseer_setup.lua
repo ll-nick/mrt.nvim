@@ -1,6 +1,8 @@
 local overseer = require("overseer")
 local Path = require("plenary.path")
 
+local config = require("mrt.config")
+
 local catkin_parser = {
     {
         -- Keep going even if the logdir extraction fails
@@ -45,12 +47,14 @@ local catkin_parser = {
 }
 
 local register_build_workspace_template = function()
+    local settings = config.get_settings()
+
     overseer.register_template({
         name = "mrt_build_workspace",
         builder = function()
             return {
                 cmd = "mrt",
-                args = { "catkin", "build", "-j4", "-c", "--no-coverage" },
+                args = settings.build_workspace_flags,
                 components = {
                     "default",
                     {

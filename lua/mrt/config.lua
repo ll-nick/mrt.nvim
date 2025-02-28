@@ -8,7 +8,7 @@ local settings = {
     },
 
     -- The command to build an entire catkin workspace
-    build_workspace_command = "mrt catkin build -j4 -c --no-coverage",
+    build_workspace_flags = { "build", "-j4", "-c", "--no-coverage" },
 
     -- The command to build the current package
     build_package_command = "mrt catkin build -j4 -c --no-coverage --this",
