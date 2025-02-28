@@ -9,6 +9,8 @@ local overseer_setup = require("mrt.mrt_overseer_setup")
 
 mrt.setup = config.setup
 
+overseer_setup.register_templates()
+
 mrt.build_workspace = function()
     if not utils.is_catkin_workspace() then
         print("Command must be called from inside a catkin workspace.")
