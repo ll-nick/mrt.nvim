@@ -10,11 +10,19 @@ local get_profiles = function()
     local result = handle:read("*a")
     handle:close()
 
-    local profiles = {}
+    local profiles = { active = nil, available = {} }
     for profile in result:gmatch("- [^\r\n]+") do
         -- Remove the leading "- " from the profile name
-        profile = profile:gsub("^%- ", "")
-        table.insert(profiles, profile)
+        local clean_profile = profile:gsub("^%- ", "")
+
+        local is_active = clean_profile:find("%(active%)") ~= nil
+        if is_active then
+            -- Remove the "(active)" suffix from the profile name
+            clean_profile = clean_profile:gsub(" %(active%)", "")
+            profiles.active = clean_profile
+        else
+            table.insert(profiles.available, clean_profile)
+        end
     end
 
     return profiles
@@ -30,15 +38,25 @@ local set_profile = function(profile)
 end
 
 M.switch_profile_ui = function()
-    vim.ui.select(get_profiles(), { prompt = "Select Catkin Profile:" }, function(selected_profile)
-        if not selected_profile then
-            return
-        end
+    local profiles = get_profiles()
 
-        local is_active = selected_profile:find("(active)") ~= nil
-        if is_active then
-            selected_profile = selected_profile:gsub(" %(active%)", "")
-            print("Profile already selected: " .. selected_profile)
+    if not profiles then
+        print("Failed to get Catkin profiles.")
+        return
+    end
+
+    if profiles.available == {} then
+        print("No profiles available to switch to.")
+        return
+    end
+
+    local prompt = "Select Catkin Profile:"
+    if profiles.active then
+        prompt = prompt .. " (Current: " .. profiles.active .. ")"
+    end
+
+    vim.ui.select(profiles.available, { prompt = prompt }, function(selected_profile)
+        if not selected_profile then
             return
         end
 
