@@ -1,7 +1,7 @@
 local M = {}
 
 local get_profiles = function()
-    local handle = io.popen("catkin profile list")
+    local handle = io.popen("mrt catkin profile list")
     if not handle then
         print("Failed to open pipe for command execution.")
         return false
