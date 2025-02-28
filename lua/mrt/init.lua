@@ -4,13 +4,13 @@ local Path = require("plenary.path")
 
 local catkin_profile = require("mrt.catkin_profile")
 local config = require("mrt.config")
-local overseer_setup = require("mrt.mrt_overseer_setup")
+local mrt_overseer = require("mrt.overseer")
 local package_picker = require("mrt.package_picker")
 local utils = require("mrt.utils")
 
 mrt.setup = config.setup
 
-overseer_setup.register_templates()
+mrt_overseer.register_templates()
 
 mrt.build_workspace = function()
     local cwd = Path:new(vim.fn.getcwd())
@@ -19,7 +19,7 @@ mrt.build_workspace = function()
         return
     end
 
-    overseer_setup.build_workspace()
+    mrt_overseer.build_workspace()
 end
 
 mrt.build_current_package = function()
@@ -29,7 +29,7 @@ mrt.build_current_package = function()
         return
     end
 
-    overseer_setup.build_current_package()
+    mrt_overseer.build_current_package()
 end
 
 mrt.build_current_package_tests = function()
@@ -39,7 +39,7 @@ mrt.build_current_package_tests = function()
         return
     end
 
-    overseer_setup.build_current_package_tests()
+    mrt_overseer.build_current_package_tests()
 end
 
 mrt.switch_catkin_profile = function()
