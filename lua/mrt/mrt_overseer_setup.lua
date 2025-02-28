@@ -2,6 +2,7 @@ local overseer = require("overseer")
 local Path = require("plenary.path")
 
 local config = require("mrt.config")
+local utils = require("mrt.utils")
 
 local catkin_parser = {
     {
@@ -87,11 +88,6 @@ local register_build_workspace_template = function()
                 },
             }
         end,
-        condition = {
-            callback = function()
-                return vim.fn.executable("mrt") == 1 -- Ensure 'mrt' is available
-            end,
-        },
     })
 end
 
