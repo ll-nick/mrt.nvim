@@ -46,6 +46,24 @@ local catkin_parser = {
     },
 }
 
+local register_compile_commands_template = function()
+    overseer.register_template({
+        name = "generate_compile_commands",
+        builder = function()
+            return {
+                cmd = {
+                    "sh",
+                },
+                args = {
+                    "-c",
+                    "jq -s 'map(.[])' $(echo \"build_$(cat .catkin_tools/profiles/profiles.yaml | sed 's/active: //')\" | sed 's/_release//')/**/compile_commands.json > compile_commands.json",
+                },
+            }
+        end,
+        desc = "Map compile_commands.json from individual packages to a single file",
+    })
+end
+
 local register_build_workspace_template = function()
     local settings = config.get_settings()
 
@@ -79,6 +97,7 @@ end
 local M = {}
 
 M.register_templates = function()
+    register_compile_commands_template()
     register_build_workspace_template()
 end
 
