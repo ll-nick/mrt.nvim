@@ -1,32 +1,4 @@
-local M = {}
-
-local get_profiles = function()
-    local handle = io.popen("mrt catkin profile list")
-    if not handle then
-        print("Failed to open pipe for command execution.")
-        return false
-    end
-
-    local result = handle:read("*a")
-    handle:close()
-
-    local profiles = { active = nil, available = {} }
-    for profile in result:gmatch("- [^\r\n]+") do
-        -- Remove the leading "- " from the profile name
-        local clean_profile = profile:gsub("^%- ", "")
-
-        local is_active = clean_profile:find("%(active%)") ~= nil
-        if is_active then
-            -- Remove the "(active)" suffix from the profile name
-            clean_profile = clean_profile:gsub(" %(active%)", "")
-            profiles.active = clean_profile
-        else
-            table.insert(profiles.available, clean_profile)
-        end
-    end
-
-    return profiles
-end
+local utils = require("mrt.utils")
 
 local set_profile = function(profile)
     local handle = io.popen("mrt catkin profile set " .. profile)
@@ -37,8 +9,9 @@ local set_profile = function(profile)
     handle:close()
 end
 
+local M = {}
 M.switch_profile_ui = function()
-    local profiles = get_profiles()
+    local profiles = utils.get_catkin_profiles()
 
     if not profiles then
         print("Failed to get Catkin profiles.")

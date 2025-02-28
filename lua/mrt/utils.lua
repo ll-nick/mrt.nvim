@@ -52,4 +52,32 @@ M.is_catkin_workspace = function()
     return M.find_workspace_root() ~= nil
 end
 
+M.get_catkin_profiles = function()
+    local handle = io.popen("mrt catkin profile list")
+    if not handle then
+        print("Failed to open pipe for command execution.")
+        return false
+    end
+
+    local result = handle:read("*a")
+    handle:close()
+
+    local profiles = { active = nil, available = {} }
+    for profile in result:gmatch("- [^\r\n]+") do
+        -- Remove the leading "- " from the profile name
+        local clean_profile = profile:gsub("^%- ", "")
+
+        local is_active = clean_profile:find("%(active%)") ~= nil
+        if is_active then
+            -- Remove the "(active)" suffix from the profile name
+            clean_profile = clean_profile:gsub(" %(active%)", "")
+            profiles.active = clean_profile
+        else
+            table.insert(profiles.available, clean_profile)
+        end
+    end
+
+    return profiles
+end
+
 return M
