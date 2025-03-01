@@ -123,14 +123,17 @@ M.register_templates = function()
 end
 
 M.build_workspace = function()
+    vim.cmd("compiler! gcc")
     overseer.run_template({ name = "MRT Build: Workspace" })
 end
 
 M.build_current_package = function()
+    vim.cmd("compiler! gcc")
     overseer.run_template({ name = "MRT Build: Current Package" })
 end
 
 M.build_current_package_tests = function()
+    vim.cmd("compiler! gcc")
     overseer.run_template({ name = "MRT Build: Tests of Current Package" })
 end
 
