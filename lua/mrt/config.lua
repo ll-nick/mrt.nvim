@@ -1,27 +1,36 @@
 local M = {}
 
 local settings = {
-    -- A list of commands to run before running a build command
-    pre_build_commands = {
-        "source /opt/mrtsoftware/setup.bash",
-        "source /opt/mrtros/setup.bash",
+    --- The flags appended to the "mrt" command to build an entire catkin workspace
+    --- @type string[]
+    build_workspace_flags = { "build", "-j4", "-c", "--no-coverage" },
+
+    --- The flags appended to the "mrt" command to build the current package
+    --- @type string[]
+    build_package_flags = { "build", "-j4", "-c", "--no-coverage", "--this" },
+
+    --- The flags appended to the "mrt" command to build the tests for the current package
+    --- @type string[]
+    build_package_tests_flags = {
+        "build",
+        "-j4",
+        "-c",
+        "--this",
+        "--no-deps",
+        "--no-coverage",
+        "--verbose",
+        "--catkin-make-args",
+        "tests",
     },
 
-    -- The command to build an entire catkin workspace
-    build_workspace_command = "mrt catkin build -j4 -c --no-coverage",
-
-    -- The command to build the current package
-    build_package_command = "mrt catkin build -j4 -c --no-coverage --this",
-
-    -- The command to build tests for the current package
-    build_package_tests_command = "mrt catkin build -j4 -c --this --no-deps --no-coverage --verbose --catkin-make-args tests",
-
-    -- The terminal handler to use for running commands
-    -- Valid values are "nvim" and "tmux"
-    pane_handler = "nvim",
-
-    -- The height of the terminal pane to open
-    pane_height = 10,
+    --- Additional overseer components to use for the build templates
+    --- Note that the "on_output_parse" and "run_after" components are always included to
+    --- parse the build output and merge the compile commands
+    overseer_components = {
+        "default",
+        "on_result_diagnostics",
+        { "on_result_diagnostics_quickfix", open = true, close = true },
+    },
 }
 
 M.setup = function(options)

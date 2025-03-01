@@ -1,56 +1,45 @@
-local mrt = {}
+local Path = require("plenary.path")
 
-local build = require("mrt.build")
 local catkin_profile = require("mrt.catkin_profile")
 local config = require("mrt.config")
+local mrt_overseer = require("mrt.overseer")
 local package_picker = require("mrt.package_picker")
 local utils = require("mrt.utils")
 
-mrt.setup = config.setup
-
-mrt.build_workspace = function()
-    if not utils.is_catkin_workspace() then
-        print("Command must be called from inside a catkin workspace.")
+local run_command_if_in_workspace = function(command)
+    local cwd = Path:new(vim.fn.getcwd())
+    if not utils.is_in_catkin_workspace(cwd) then
+        vim.notify("Command must be called from inside a catkin workspace.")
         return
     end
 
-    build.workspace()
+    command()
+end
+
+local mrt = {}
+
+mrt.setup = config.setup
+
+mrt_overseer.register_templates()
+
+mrt.build_workspace = function()
+    run_command_if_in_workspace(mrt_overseer.build_workspace)
 end
 
 mrt.build_current_package = function()
-    if not utils.is_catkin_workspace() then
-        print("Command must be called from inside a catkin workspace.")
-        return
-    end
-
-    build.current_package()
+    run_command_if_in_workspace(mrt_overseer.build_current_package)
 end
 
 mrt.build_current_package_tests = function()
-    if not utils.is_catkin_workspace() then
-        print("Command must be called from inside a catkin workspace.")
-        return
-    end
-
-    build.current_package_tests()
+    run_command_if_in_workspace(mrt_overseer.build_current_package_tests)
 end
 
 mrt.switch_catkin_profile = function()
-    if not utils.is_catkin_workspace() then
-        print("This is not a valid Catkin workspace.")
-        return
-    end
-
-    catkin_profile.switch_profile_ui()
+    run_command_if_in_workspace(catkin_profile.switch_profile_ui)
 end
 
 mrt.pick_catkin_package = function()
-    if not utils.is_catkin_workspace() then
-        print("This is not a valid Catkin workspace.")
-        return
-    end
-
-    package_picker.pick_catkin_package()
+    run_command_if_in_workspace(package_picker.pick_catkin_package)
 end
 
 return mrt
