@@ -60,6 +60,14 @@ local register_compile_commands_template = function()
                     "jq -s 'map(.[])' $(echo \"build_$(cat .catkin_tools/profiles/profiles.yaml | sed 's/active: //')\" | sed 's/_release//')/**/compile_commands.json > compile_commands.json",
                 },
                 cwd = utils.find_workspace_root(Path:new(vim.fn.getcwd())):absolute(),
+                components = {
+                    "on_exit_set_status",
+                    {
+                        "on_complete_dispose",
+                        statuses = { "SUCCESS", "CANCELLED" },
+                        timeout = 1,
+                    },
+                },
             }
         end,
         priority = 100,
