@@ -63,6 +63,11 @@ local register_compile_commands_template = function()
             }
         end,
         priority = 100,
+        condition = {
+            callback = function()
+                return utils.is_in_catkin_workspace(Path:new(vim.fn.getcwd()))
+            end,
+        },
     })
 end
 
@@ -88,6 +93,11 @@ local function register_build_template(name, build_arguments)
                 cwd = vim.fn.expand("%:p:h"),
             }
         end,
+        condition = {
+            callback = function()
+                return utils.is_in_catkin_workspace(Path:new(vim.fn.getcwd()))
+            end,
+        },
     })
 end
 
