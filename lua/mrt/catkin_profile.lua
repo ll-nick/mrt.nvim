@@ -1,10 +1,12 @@
 local utils = require("mrt.utils")
 
+--- Activate the given catkin profile.
+--- @param profile string
 local set_profile = function(profile)
     local handle = io.popen("mrt catkin profile set " .. profile)
     if not handle then
         vim.notify("Failed to open pipe for command execution.")
-        return false
+        return
     end
     handle:close()
 end

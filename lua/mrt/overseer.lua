@@ -77,6 +77,9 @@ local register_compile_commands_template = function()
     })
 end
 
+--- Register a template with overseer that runs the `mrt` command with the given build arguments.
+--- @param name string
+--- @param build_arguments string[]
 local function register_build_template(name, build_arguments)
     overseer.register_template({
         name = name,

@@ -1,7 +1,8 @@
-local Path = require("plenary.path")
-
 local M = {}
 
+--- Finds the root directory of a catkin workspace by searching for the `.catkin_tools` directory in the parent directories.
+--- @param directory Path The starting directory for the search.
+--- @return Path|nil workspace_root The root directory of the catkin workspace if the given directory is inside a catkin workspace, otherwise nil.
 M.find_workspace_root = function(directory)
     local current_dir = directory
     while current_dir:absolute() ~= "/" do
@@ -14,16 +15,25 @@ M.find_workspace_root = function(directory)
     return nil
 end
 
+--- Checks if a given directory is inside a catkin workspace.
+--- @param directory Path The directory to check.
+--- @return boolean is_inside `true` if inside a catkin workspace, otherwise `false`.
 M.is_in_catkin_workspace = function(directory)
     return M.find_workspace_root(directory) ~= nil
 end
 
+--- @class CatkinProfiles
+--- @field active string|nil The currently active catkin profile.
+--- @field available string[] A list of available profiles excluding the active one.
+
+--- Retrieves the active and available catkin profiles
+--- @return CatkinProfiles|nil A table containing the active profile and available profiles or nil if the command execution failed.
 M.get_catkin_profiles = function()
     -- TODO: Replace this by manually parsing the .catkin_profile directory
     local handle = io.popen("mrt catkin profile list")
     if not handle then
         print("Failed to open pipe for command execution.")
-        return false
+        return nil
     end
 
     local result = handle:read("*a")
