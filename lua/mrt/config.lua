@@ -22,6 +22,15 @@ local settings = {
         "--catkin-make-args",
         "tests",
     },
+
+    --- Additional overseer components to use for the build templates
+    --- Note that the "on_output_parse" and "run_after" components are always included to
+    --- parse the build output and merge the compile commands
+    overseer_components = {
+        "default",
+        "on_result_diagnostics",
+        { "on_result_diagnostics_quickfix", open = true, close = true },
+    },
 }
 
 M.setup = function(options)

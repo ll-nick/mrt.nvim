@@ -81,24 +81,26 @@ end
 --- @param name string
 --- @param build_arguments string[]
 local function register_build_template(name, build_arguments)
+    -- We will always use at least the following components
+    local components = {
+        { "on_output_parse", parser = { diagnostics = catkin_parser } },
+        { "run_after", task_names = { "Merge Compile Commands" } },
+    }
+
+    -- Additional components can be added via the settings
+    local settings = config.get_settings()
+    local extra_components = settings.overseer_components
+    if extra_components then
+        vim.list_extend(components, extra_components)
+    end
+
     overseer.register_template({
         name = name,
         builder = function()
             return {
                 cmd = "mrt",
                 args = build_arguments,
-                components = {
-                    "default",
-                    {
-                        "on_output_parse",
-                        parser = {
-                            diagnostics = catkin_parser,
-                        },
-                    },
-                    "on_result_diagnostics",
-                    { "on_result_diagnostics_quickfix", open = true, close = true },
-                    { "run_after", task_names = { "Merge Compile Commands" } },
-                },
+                components = components,
                 cwd = vim.fn.expand("%:p:h"),
             }
         end,
