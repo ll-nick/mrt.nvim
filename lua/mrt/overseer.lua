@@ -15,7 +15,7 @@ local catkin_parser = {
                 append = false,
                 postprocess = function(item, _)
                     if item.logdir then
-                        logdir_cache = item.logdir
+                        logdir_cache = Path:new(item.logdir)
                         item.logdir = nil
                     end
                 end,
@@ -35,12 +35,9 @@ local catkin_parser = {
                 if item.filename and logdir ~= "" then
                     -- Remove cwd from filename
                     item.filename = item.filename:gsub("^" .. vim.pesc(cwd) .. "/", "")
-                    -- Prepend logdir
-                    item.filename = logdir .. "/" .. item.filename
-
-                    -- Resolve path
-                    local resolved_path = Path:new(item.filename):normalize()
-                    item.filename = resolved_path
+                    -- Prepend logdir and make it relative to the cwd
+                    -- Vim will resolve the path to the cwd so is necessary in case the task runs in a different directory
+                    item.filename = logdir:joinpath(item.filename):make_relative(cwd)
                 end
             end,
         },
