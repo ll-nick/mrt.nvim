@@ -15,7 +15,8 @@ local catkin_parser = {
                 append = false,
                 postprocess = function(item, _)
                     if item.logdir then
-                        logdir_cache = Path:new(item.logdir)
+                        ---@todo - This feels hacky, what's the proper way to store this?
+                        CatkinParserCurrentLogDirectory = Path:new(item.logdir)
                         item.logdir = nil
                     end
                 end,
@@ -31,7 +32,7 @@ local catkin_parser = {
         {
             postprocess = function(item, _)
                 local cwd = vim.fn.getcwd()
-                local logdir = logdir_cache
+                local logdir = CatkinParserCurrentLogDirectory
                 if item.filename and logdir ~= "" then
                     -- Remove cwd from filename
                     item.filename = item.filename:gsub("^" .. vim.pesc(cwd) .. "/", "")
