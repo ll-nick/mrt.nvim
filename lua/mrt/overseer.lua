@@ -85,6 +85,7 @@ local function register_build_template(name, build_arguments)
                     "on_result_diagnostics_quickfix",
                     { "run_after", task_names = { "generate_compile_commands" } },
                 },
+                cwd = vim.fn.expand("%:p:h"),
             }
         end,
     })
@@ -107,11 +108,11 @@ M.build_workspace = function()
 end
 
 M.build_current_package = function()
-    overseer.run_template({ name = "mrt_build_package", cwd = vim.fn.expand("%:p:h") })
+    overseer.run_template({ name = "mrt_build_package" })
 end
 
 M.build_current_package_tests = function()
-    overseer.run_template({ name = "mrt_build_package_tests", cwd = vim.fn.expand("%:p:h") })
+    overseer.run_template({ name = "mrt_build_package_tests" })
 end
 
 return M
