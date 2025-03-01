@@ -62,6 +62,7 @@ local register_compile_commands_template = function()
                 cwd = utils.find_workspace_root(Path:new(vim.fn.getcwd())):absolute(),
             }
         end,
+        priority = 100,
     })
 end
 
