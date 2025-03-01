@@ -59,6 +59,7 @@ local register_compile_commands_template = function()
                     "-c",
                     "jq -s 'map(.[])' $(echo \"build_$(cat .catkin_tools/profiles/profiles.yaml | sed 's/active: //')\" | sed 's/_release//')/**/compile_commands.json > compile_commands.json",
                 },
+                cwd = utils.find_workspace_root(Path:new(vim.fn.getcwd())):absolute(),
             }
         end,
         desc = "Map compile_commands.json from individual packages to a single file",
