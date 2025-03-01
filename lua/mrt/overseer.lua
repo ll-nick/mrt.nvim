@@ -92,7 +92,7 @@ local function register_build_template(name, build_arguments)
                         },
                     },
                     "on_result_diagnostics",
-                    "on_result_diagnostics_quickfix",
+                    { "on_result_diagnostics_quickfix", open = true, close = true },
                     { "run_after", task_names = { "Merge Compile Commands" } },
                 },
                 cwd = vim.fn.expand("%:p:h"),
