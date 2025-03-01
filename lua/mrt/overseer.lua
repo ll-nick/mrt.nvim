@@ -49,7 +49,7 @@ local catkin_parser = {
 
 local register_compile_commands_template = function()
     overseer.register_template({
-        name = "generate_compile_commands",
+        name = "Merge Compile Commands",
         builder = function()
             return {
                 cmd = {
@@ -62,7 +62,6 @@ local register_compile_commands_template = function()
                 cwd = utils.find_workspace_root(Path:new(vim.fn.getcwd())):absolute(),
             }
         end,
-        desc = "Map compile_commands.json from individual packages to a single file",
     })
 end
 
@@ -83,7 +82,7 @@ local function register_build_template(name, build_arguments)
                     },
                     "on_result_diagnostics",
                     "on_result_diagnostics_quickfix",
-                    { "run_after", task_names = { "generate_compile_commands" } },
+                    { "run_after", task_names = { "Merge Compile Commands" } },
                 },
                 cwd = vim.fn.expand("%:p:h"),
             }
@@ -98,21 +97,21 @@ M.register_templates = function()
 
     register_compile_commands_template()
 
-    register_build_template("mrt_build_workspace", settings.build_workspace_flags)
-    register_build_template("mrt_build_package", settings.build_package_flags)
-    register_build_template("mrt_build_package_tests", settings.build_package_tests_flags)
+    register_build_template("MRT Build: Workspace", settings.build_workspace_flags)
+    register_build_template("MRT Build: Current Package", settings.build_package_flags)
+    register_build_template("MRT Build: Tests of Current Package", settings.build_package_tests_flags)
 end
 
 M.build_workspace = function()
-    overseer.run_template({ name = "mrt_build_workspace" })
+    overseer.run_template({ name = "MRT Build: Workspace" })
 end
 
 M.build_current_package = function()
-    overseer.run_template({ name = "mrt_build_package" })
+    overseer.run_template({ name = "MRT Build: Current Package" })
 end
 
 M.build_current_package_tests = function()
-    overseer.run_template({ name = "mrt_build_package_tests" })
+    overseer.run_template({ name = "MRT Build: Tests of Current Package" })
 end
 
 return M
