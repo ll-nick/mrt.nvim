@@ -65,67 +65,13 @@ local register_compile_commands_template = function()
     })
 end
 
-local register_build_workspace_template = function()
-    local settings = config.get_settings()
-
+local function register_build_template(name, build_arguments)
     overseer.register_template({
-        name = "mrt_build_workspace",
+        name = name,
         builder = function()
             return {
                 cmd = "mrt",
-                args = settings.build_workspace_flags,
-                components = {
-                    "default",
-                    {
-                        "on_output_parse",
-                        parser = {
-                            diagnostics = catkin_parser,
-                        },
-                    },
-                    "on_result_diagnostics",
-                    "on_result_diagnostics_quickfix",
-                    { "run_after", task_names = { "generate_compile_commands" } },
-                },
-            }
-        end,
-    })
-end
-
-local register_build_package_template = function()
-    local settings = config.get_settings()
-
-    overseer.register_template({
-        name = "mrt_build_package",
-        builder = function()
-            return {
-                cmd = "mrt",
-                args = settings.build_package_flags,
-                components = {
-                    "default",
-                    {
-                        "on_output_parse",
-                        parser = {
-                            diagnostics = catkin_parser,
-                        },
-                    },
-                    "on_result_diagnostics",
-                    "on_result_diagnostics_quickfix",
-                    { "run_after", task_names = { "generate_compile_commands" } },
-                },
-            }
-        end,
-    })
-end
-
-local register_build_package_tests_template = function()
-    local settings = config.get_settings()
-
-    overseer.register_template({
-        name = "mrt_build_package_tests",
-        builder = function()
-            return {
-                cmd = "mrt",
-                args = settings.build_package_tests_flags,
+                args = build_arguments,
                 components = {
                     "default",
                     {
@@ -146,10 +92,13 @@ end
 local M = {}
 
 M.register_templates = function()
+    local settings = config.get_settings()
+
     register_compile_commands_template()
-    register_build_workspace_template()
-    register_build_package_template()
-    register_build_package_tests_template()
+
+    register_build_template("mrt_build_workspace", settings.build_workspace_flags)
+    register_build_template("mrt_build_package", settings.build_package_flags)
+    register_build_template("mrt_build_package_tests", settings.build_package_tests_flags)
 end
 
 M.build_workspace = function()
