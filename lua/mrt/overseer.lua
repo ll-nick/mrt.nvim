@@ -85,10 +85,12 @@ local register_compile_commands_template = function()
     })
 end
 
+local M = {}
+
 --- Register a template with overseer that runs the `mrt` command with the given build arguments.
 --- @param name string
 --- @param build_arguments string[]
-local function register_build_template(name, build_arguments)
+M.register_build_template = function(name, build_arguments)
     -- We will always use at least the following components
     local components = {
         { "on_output_parse", parser = { diagnostics = catkin_parser } },
@@ -120,16 +122,14 @@ local function register_build_template(name, build_arguments)
     })
 end
 
-local M = {}
-
 M.register_templates = function()
     local settings = config.get_settings()
 
     register_compile_commands_template()
 
-    register_build_template("MRT Build: Workspace", settings.build_workspace_flags)
-    register_build_template("MRT Build: Current Package", settings.build_package_flags)
-    register_build_template("MRT Build: Tests of Current Package", settings.build_package_tests_flags)
+    M.register_build_template("MRT Build: Workspace", settings.build_workspace_flags)
+    M.register_build_template("MRT Build: Current Package", settings.build_package_flags)
+    M.register_build_template("MRT Build: Tests of Current Package", settings.build_package_tests_flags)
 end
 
 M.build_workspace = function()
