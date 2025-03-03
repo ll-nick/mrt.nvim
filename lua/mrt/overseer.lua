@@ -133,14 +133,17 @@ M.register_templates = function()
 end
 
 M.build_workspace = function()
+    vim.notify("Building workspace...")
     overseer.run_template({ name = "MRT Build: Workspace" })
 end
 
 M.build_current_package = function()
+    vim.notify("Building current package...")
     overseer.run_template({ name = "MRT Build: Current Package" })
 end
 
 M.build_current_package_tests = function()
+    vim.notify("Building tests of current package...")
     overseer.run_template({ name = "MRT Build: Tests of Current Package" })
 end
 
