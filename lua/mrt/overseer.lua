@@ -5,42 +5,50 @@ local config = require("mrt.config")
 local utils = require("mrt.utils")
 
 local catkin_parser = {
+    "sequence",
+    -- This line will give us the log directory of the current package
+    -- The gcc error messages will be relative to this directory and we need to adjust the paths
+    { "extract", { append = false }, "^Errors%s+<<%s+[^:]+:make%s+(.+)/[^/]+$", "log_directory" },
     {
-        -- Keep going even if the logdir extraction fails
-        "always",
+        -- Set the log_directory as a default value in all following items so we have access to it during the extraction postprocess.
+        "set_defaults",
         {
-            -- Extract logdir from the first line of the error message and cache it
-            "extract",
+            -- Now parse all messages from this package.
+            "loop",
             {
-                append = false,
-                postprocess = function(item, _)
-                    if item.logdir then
-                        ---@todo - This feels hacky, what's the proper way to store this?
-                        CatkinParserCurrentLogDirectory = Path:new(item.logdir)
-                        item.logdir = nil
-                    end
-                end,
+                -- Try extracting an error message, then check the termination condition.
+                "sequence",
+                {
+                    -- We want to keep going even if the extraction fails on a line.
+                    "always",
+                    {
+                        -- Try extracting an error message. If successful, adjust the path to be relative to the cwd rather than the log directory.
+                        "extract",
+                        {
+                            postprocess = function(item, result)
+                                -- If the filename is already an absolute path, the error is from a system header and we don't want to adjust the path.
+                                if item.filename:match("^/") then
+                                    return
+                                end
+                                -- Prepend the log directory to the extracted path
+                                local absolute_path =
+                                    Path:new(result.default_values.log_directory):joinpath(item.filename):absolute()
+                                item.filename = absolute_path
+                            end,
+                        },
+                        -- This will match lines like
+                        -- "../../src/package_name/file.cpp:123:45: error: message"
+                        "([^:]+):(%d+):(%d+): (%w+): (.+)",
+                        "filename",
+                        "lnum",
+                        "col",
+                        "type",
+                        "message",
+                    },
+                },
+                -- Terminate the loop when we find the start of the next package.
+                { "invert", { "test", "^Errors%s+<<" } },
             },
-            "^Errors%s+<<%s+[^:]+:make%s+(.+)/[^/]+$",
-            "logdir",
-        },
-    },
-    {
-        -- Extract diagnostics via the default gcc error format
-        -- Adjust the path which is relative to the logdir
-        "extract_efm",
-        {
-            postprocess = function(item, _)
-                local cwd = vim.fn.getcwd()
-                local logdir = CatkinParserCurrentLogDirectory
-                if item.filename and logdir ~= "" then
-                    -- Remove cwd from filename
-                    item.filename = item.filename:gsub("^" .. vim.pesc(cwd) .. "/", "")
-                    -- Prepend logdir and make it relative to the cwd
-                    -- Vim will resolve the path to the cwd so is necessary in case the task runs in a different directory
-                    item.filename = logdir:joinpath(item.filename):make_relative(cwd)
-                end
-            end,
         },
     },
 }
@@ -125,17 +133,14 @@ M.register_templates = function()
 end
 
 M.build_workspace = function()
-    vim.cmd("compiler! gcc")
     overseer.run_template({ name = "MRT Build: Workspace" })
 end
 
 M.build_current_package = function()
-    vim.cmd("compiler! gcc")
     overseer.run_template({ name = "MRT Build: Current Package" })
 end
 
 M.build_current_package_tests = function()
-    vim.cmd("compiler! gcc")
     overseer.run_template({ name = "MRT Build: Tests of Current Package" })
 end
 
