@@ -1,3 +1,6 @@
+local Path = require("plenary.path")
+local scan = require("plenary.scandir")
+
 local M = {}
 
 --- Finds the root directory of a catkin workspace by searching for the `.catkin_tools` directory in the parent directories.
@@ -27,34 +30,48 @@ end
 --- @field available string[] A list of available profiles excluding the active one.
 
 --- Retrieves the active and available catkin profiles
+--- @param ws_root Path A directory inside the catkin workspace.
 --- @return CatkinProfiles|nil A table containing the active profile and available profiles or nil if the command execution failed.
-M.get_catkin_profiles = function()
-    -- TODO: Replace this by manually parsing the .catkin_profile directory
-    local handle = io.popen("mrt catkin profile list")
-    if not handle then
-        print("Failed to open pipe for command execution.")
+M.get_catkin_profiles = function(ws_root)
+    if not ws_root then
         return nil
     end
 
-    local result = handle:read("*a")
-    handle:close()
+    local profile_path = ws_root:joinpath(".catkin_tools/profiles")
+    if not profile_path:exists() then
+        return nil
+    end
 
-    local profiles = { active = nil, available = {} }
-    for profile in result:gmatch("- [^\r\n]+") do
-        -- Remove the leading "- " from the profile name
-        local clean_profile = profile:gsub("^%- ", "")
+    local profiles_yaml = profile_path:joinpath("profiles.yaml")
+    if not profiles_yaml:exists() then
+        return nil
+    end
 
-        local is_active = clean_profile:find("%(active%)") ~= nil
-        if is_active then
-            -- Remove the "(active)" suffix from the profile name
-            clean_profile = clean_profile:gsub(" %(active%)", "")
-            profiles.active = clean_profile
-        else
-            table.insert(profiles.available, clean_profile)
+    local active_profile = nil
+    if profiles_yaml:exists() then
+        for _, line in ipairs(profiles_yaml:readlines()) do
+            local name = line:match("active: (.+)")
+            if name then
+                active_profile = name
+                break
+            end
         end
     end
 
-    return profiles
+    local available_profiles_absolute =
+        scan.scan_dir(profile_path.filename, { depth = 1, add_dirs = true, only_dirs = true })
+    local available_profiles = {}
+    for _, profile in ipairs(available_profiles_absolute) do
+        local profile_name = Path:new(profile):make_relative(profile_path.filename)
+        if profile_name ~= active_profile then
+            table.insert(available_profiles, profile_name)
+        end
+    end
+
+    return {
+        active = active_profile,
+        available = available_profiles,
+    }
 end
 
 return M

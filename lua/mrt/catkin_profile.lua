@@ -1,3 +1,5 @@
+local Path = require("plenary.path")
+
 local utils = require("mrt.utils")
 
 --- Activate the given catkin profile.
@@ -13,7 +15,9 @@ end
 
 local M = {}
 M.switch_profile_ui = function()
-    local profiles = utils.get_catkin_profiles()
+    local cwd = Path:new(vim.fn.getcwd())
+    local ws_root = utils.find_workspace_root(cwd)
+    local profiles = utils.get_catkin_profiles(ws_root)
 
     if not profiles then
         vim.notify("Failed to get catkin profiles.")
