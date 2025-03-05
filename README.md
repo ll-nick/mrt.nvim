@@ -89,6 +89,27 @@ The build commands utilize the awesome [overseer.nvim](https://github.com/stevea
 You should probably have a look at their readme to see what you can do with it.
 Most importantly, `:OverseerToggle` toggles the task list.
 
+
+### Custom Build Templates
+
+You can also register additional build commands, for example, to build a specific package:
+
+```lua
+require("mrt.overseer").register_build_template(
+  "MRT Build: My Awesome Package",
+  { "build", "-j4", "my_awesome_package" }
+)
+```
+
+The template can be executed using the `:OverseerRun` interactive menu, or via lua:
+
+```lua
+require("overseer").run_template({ name = "MRT Build: My Awesome Package" })
+```
+
+The given flags will be appended to the `mrt` command, the build output will be parsed, and the task to merge the compile commands will be executed afterwards.
+
+
 ### 🔧 Configuration
 
 Here's the default configuration:
