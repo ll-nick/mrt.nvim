@@ -7,10 +7,16 @@ local utils = require("mrt.utils")
 local set_profile = function(profile)
     local handle = io.popen("mrt catkin profile set " .. profile)
     if not handle then
-        vim.notify("Failed to open pipe for command execution.")
+        vim.notify("Failed to open pipe for command execution.", vim.log.levels.ERROR)
         return
     end
+
+    local result = handle:read("*a")
     handle:close()
+
+    if not result or result == "" then
+        vim.notify("Failed to switch profile. Command might not have executed properly.", vim.log.levels.ERROR)
+    end
 end
 
 local M = {}
