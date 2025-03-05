@@ -1,49 +1,42 @@
-local M = {}
+local utils = require("mrt.utils")
 
-local get_profiles = function()
-    local handle = io.popen("catkin profile list")
-    if not handle then
-        print("Failed to open pipe for command execution.")
-        return false
-    end
-
-    local result = handle:read("*a")
-    handle:close()
-
-    local profiles = {}
-    for profile in result:gmatch("- [^\r\n]+") do
-        -- Remove the leading "- " from the profile name
-        profile = profile:gsub("^%- ", "")
-        table.insert(profiles, profile)
-    end
-
-    return profiles
-end
-
+--- Activate the given catkin profile.
+--- @param profile string
 local set_profile = function(profile)
     local handle = io.popen("mrt catkin profile set " .. profile)
     if not handle then
-        print("Failed to open pipe for command execution.")
-        return false
+        vim.notify("Failed to open pipe for command execution.")
+        return
     end
     handle:close()
 end
 
+local M = {}
 M.switch_profile_ui = function()
-    vim.ui.select(get_profiles(), { prompt = "Select Catkin Profile:" }, function(selected_profile)
+    local profiles = utils.get_catkin_profiles()
+
+    if not profiles then
+        vim.notify("Failed to get catkin profiles.")
+        return
+    end
+
+    if profiles.available == {} then
+        vim.notify("No profiles available to switch to.")
+        return
+    end
+
+    local prompt = "Select Catkin Profile:"
+    if profiles.active then
+        prompt = prompt .. " (Current: " .. profiles.active .. ")"
+    end
+
+    vim.ui.select(profiles.available, { prompt = prompt }, function(selected_profile)
         if not selected_profile then
             return
         end
 
-        local is_active = selected_profile:find("(active)") ~= nil
-        if is_active then
-            selected_profile = selected_profile:gsub(" %(active%)", "")
-            print("Profile already selected: " .. selected_profile)
-            return
-        end
-
         set_profile(selected_profile)
-        print("Switched to profile: " .. selected_profile)
+        vim.notify("Switched to profile: " .. selected_profile)
     end)
 end
 
