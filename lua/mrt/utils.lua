@@ -1,3 +1,6 @@
+local Path = require("plenary.path")
+local scan = require("plenary.scandir")
+
 local M = {}
 
 --- Finds the root directory of a catkin workspace by searching for the `.catkin_tools` directory in the parent directories.
@@ -26,35 +29,66 @@ end
 --- @field active string|nil The currently active catkin profile.
 --- @field available string[] A list of available profiles excluding the active one.
 
---- Retrieves the active and available catkin profiles
---- @return CatkinProfiles|nil A table containing the active profile and available profiles or nil if the command execution failed.
-M.get_catkin_profiles = function()
-    -- TODO: Replace this by manually parsing the .catkin_profile directory
-    local handle = io.popen("mrt catkin profile list")
-    if not handle then
-        print("Failed to open pipe for command execution.")
+--- Reads the active profile from profiles.yaml
+--- @param profiles_yaml Path The path to profiles.yaml
+--- @return string|nil The active profile name or nil if not found
+local function get_active_profile(profiles_yaml)
+    if not profiles_yaml:exists() then
         return nil
     end
 
-    local result = handle:read("*a")
-    handle:close()
-
-    local profiles = { active = nil, available = {} }
-    for profile in result:gmatch("- [^\r\n]+") do
-        -- Remove the leading "- " from the profile name
-        local clean_profile = profile:gsub("^%- ", "")
-
-        local is_active = clean_profile:find("%(active%)") ~= nil
-        if is_active then
-            -- Remove the "(active)" suffix from the profile name
-            clean_profile = clean_profile:gsub(" %(active%)", "")
-            profiles.active = clean_profile
-        else
-            table.insert(profiles.available, clean_profile)
+    for _, line in ipairs(profiles_yaml:readlines()) do
+        local name = line:match("active:%s*(.+)")
+        if name then
+            return name
         end
     end
+    return nil
+end
 
-    return profiles
+--- Retrieves all available catkin profiles
+--- @param profile_path Path The path to the profiles directory
+--- @return table A list of profile names
+local function get_available_profiles(profile_path)
+    if not profile_path:exists() then
+        return {}
+    end
+
+    local available_profiles = {}
+    local profiles_absolute = scan.scan_dir(profile_path.filename, { depth = 1, add_dirs = true, only_dirs = true })
+
+    for _, profile in ipairs(profiles_absolute) do
+        table.insert(available_profiles, Path:new(profile):make_relative(profile_path.filename))
+    end
+
+    return available_profiles
+end
+
+--- Retrieves the active and available catkin profiles
+--- @param ws_root Path The root of the catkin workspace
+--- @return table|nil A table containing the active profile and available profiles, or nil if invalid.
+M.get_catkin_profiles = function(ws_root)
+    if not ws_root then
+        return nil
+    end
+
+    local profile_path = ws_root:joinpath(".catkin_tools/profiles")
+    local profiles_yaml = profile_path:joinpath("profiles.yaml")
+
+    local active_profile = get_active_profile(profiles_yaml)
+    local available_profiles = get_available_profiles(profile_path)
+
+    -- Remove the active profile from available profiles
+    if active_profile then
+        available_profiles = vim.tbl_filter(function(p)
+            return p ~= active_profile
+        end, available_profiles)
+    end
+
+    return {
+        active = active_profile,
+        available = available_profiles,
+    }
 end
 
 return M
