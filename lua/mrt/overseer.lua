@@ -43,7 +43,7 @@ local catkin_parser = {
                         "lnum",
                         "col",
                         "type",
-                        "message",
+                        "text",
                     },
                 },
                 -- Terminate the loop when we find the start of the next package.
